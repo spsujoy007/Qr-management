@@ -5,6 +5,8 @@ var makeQrCode = require('qrcode');
 var jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+app.use(express.json());
+
 const cors = require('cors');
 app.use(cors());
 
@@ -42,7 +44,7 @@ async function run() {
             const userinfo = {
                 code: verifyCode.toString()
             }
-            makeQrCode.toDataURL(`http://192.168.1.12:5500/verify.html?code=${JSON.stringify(userinfo)}`, function (err, url) {
+            makeQrCode.toDataURL(`http://192.168.1.12:5500/verify.html?code=${verifyCode.toString()}`, function (err, url) {
                 try {
                     if (err) {
                     console.log(err);
@@ -60,11 +62,12 @@ async function run() {
             // console.log(data)
         })
 
-        app.get("/verify", (req, res) => {
+        app.post("/verify", (req, res) => {
+            const { name, email} = req.body;
             const code = req.query.code;
-            console.log("Verification code received:", code);
+            console.log(`Hello ${name}, Verification code received: ${code}`);
 
-            res.send(`Code ${code} received. Verification successful!`);
+            // res.send(`Code ${code} received. Verification successful!`);
         })
 
         app.listen(port, () => {
