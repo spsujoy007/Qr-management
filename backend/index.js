@@ -51,6 +51,13 @@ async function run() {
                     return res.status(500).send("QR error");
                 }
 
+                jwt.sign(userinfo, process.env.JWT_SECRET, { expiresIn: '3m' }, (err, token) => {
+                    if (err) {
+                        console.log("Error signing JWT:", err);
+                        return res.status(500).send("JWT error");
+                    }
+                    console.log("Generated JWT:", token);
+                });
                 
                 return (res.send({qr_url: url, code: verifyCode.toString()}), verificationStatusCollection.insertOne({qr_url: url, code: verifyCode.toString(), verified: false, createdAt: new Date()}) );
 
