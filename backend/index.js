@@ -12,53 +12,64 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-let verifyCode = Math.floor(100000 + Math.random() * 900000);
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://<db_username>:<db_password>@cluster0.6ke0m0t.mongodb.net/?appName=Cluster0";
+const uri = process.env.MONGODB_URI;
+console.log(uri)
+
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+}
 });
 
 
-function run() {
+async function run() {
     try {
-app.get("/generate_qr", async(req, res) => {
-    console.log("hited - /generate_qr endpoint");
+        
+        await client.connect();
+        console.log("Connected to MongoDB");
+        
+        const verificationStatusCollection = client.db("qr_generator").collection("verfication_status");
+        
+        app.get("/generate_qr", async(req, res) => {
+            let verifyCode = Math.floor(100000 + Math.random() * 900000);
+            console.log("hited - /generate_qr endpoint");
 
-
-    makeQrCode.toDataURL(`http://192.168.1.12:5000/verify?code=${verifyCode.toString()}`, function (err, url) {
-            try {
-                if (err) {
-                console.log(err);
-                return res.status(500).send("QR error");
+            const userinfo = {
+                code: verifyCode.toString()
             }
+            makeQrCode.toDataURL(`http://192.168.1.12:5500/verify.html?code=${JSON.stringify(userinfo)}`, function (err, url) {
+                try {
+                    if (err) {
+                    console.log(err);
+                    return res.status(500).send("QR error");
+                }
 
-            res.send({qr_url: url, code: verifyCode.toString()});
+                
+                return (res.send({qr_url: url, code: verifyCode.toString()}), verificationStatusCollection.insertOne({qr_url: url, code: verifyCode.toString(), verified: false, createdAt: new Date()}) );
 
-            } catch (error) {
-                console.log("Error generating QR code:", error);
-                res.status(500).send("Error generating QR code");
-            }
+                } catch (error) {
+                    console.log("Error generating QR code:", error);
+                    res.status(500).send("Error generating QR code");
+                }
+            })
+            // console.log(data)
         })
-        // console.log(data)
-    })
 
-    app.get("/verify", (req, res) => {
-        const code = req.query.code;
-        console.log("Verification code received:", code);
+        app.get("/verify", (req, res) => {
+            const code = req.query.code;
+            console.log("Verification code received:", code);
 
-        res.send(`Code ${code} received. Verification successful!`);
-    })
+            res.send(`Code ${code} received. Verification successful!`);
+        })
 
-    app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-    })
+        app.listen(port, () => {
+        console.log(`Example app listening on port ${port}`)
+        })
     }
     catch (error) {
         console.log("Error in myApp function:", error);
