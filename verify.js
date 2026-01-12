@@ -32,6 +32,30 @@
         })
         .then(res => res.json())
         .then(data => {
+            if(data.status && data.status === 400){
+                const errorMsg = document.getElementById('error_msg');
+                errorMsg.classList.remove('hidden');
+                errorMsg.classList.add('text-red-500', 'font-bold', 'mb-4');
+                errorMsg.innerText = data.message;
+
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 3000);
+                return;
+            }
+            if(data.status && data.status === 401){
+                const errorMsg = document.getElementById('error_msg');
+                errorMsg.classList.remove('hidden');
+                errorMsg.classList.add('text-red-500', 'font-bold', 'mb-4');
+                errorMsg.innerText = data.message;  
+
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 3000);
+                return;
+            }
+
             console.log(data)
+            alert(data.message);
         })
     }

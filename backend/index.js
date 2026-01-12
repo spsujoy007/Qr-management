@@ -36,6 +36,7 @@ async function run() {
         console.log("Connected to MongoDB");
         
         const verificationStatusCollection = client.db("qr_generator").collection("verfication_status");
+        const bookTicketsCollection = client.db("qr_generator").collection("ticket");
         
         app.get("/generate_qr", async(req, res) => {
             let verifyCode = Math.floor(100000 + Math.random() * 900000);
@@ -51,15 +52,20 @@ async function run() {
                     return res.status(500).send("QR error");
                 }
 
-                jwt.sign(userinfo, process.env.JWT_SECRET, { expiresIn: '3m' }, (err, token) => {
-                    if (err) {
-                        console.log("Error signing JWT:", err);
-                        return res.status(500).send("JWT error");
-                    }
-                    console.log("Generated JWT:", token);
-                });
+                const getToken = () => { 
+                    return jwt.sign(userinfo, process.env.JWT_SECRET, { expiresIn: '3m' });
+                }
+                const datas = {
+                    qr_url: url, 
+                    code: verifyCode.toString(), 
+                    verified: false, 
+                    createdAt: new Date(),
+                    token: getToken()
+                }
                 
-                return (res.send({qr_url: url, code: verifyCode.toString()}), verificationStatusCollection.insertOne({qr_url: url, code: verifyCode.toString(), verified: false, createdAt: new Date()}) );
+                verificationStatusCollection.insertOne(datas) 
+                
+                return (res.send({qr_url: url, code: verifyCode.toString()}));
 
                 } catch (error) {
                     console.log("Error generating QR code:", error);
@@ -69,12 +75,36 @@ async function run() {
             // console.log(data)
         })
 
-        app.post("/verify", (req, res) => {
+        app.post("/verify", async (req, res) => {
             const { name, email} = req.body;
             const code = req.query.code;
             console.log(`Hello ${name}, Verification code received: ${code}`);
 
-            // res.send(`Code ${code} received. Verification successful!`);
+            const isAlreadyBooked = await bookTicketsCollection.findOne({code: code});
+            if(isAlreadyBooked){
+                return res.status(400).send({status: 400,message: `Code ${code} has already been used for booking.`});
+            }
+            
+            const isAlreadyQrGenerated = await verificationStatusCollection.findOne({code: code});
+            if(!isAlreadyQrGenerated){
+                return res.status(401).send({status: 401,message: `Code ${code} is invalid. Please generate a valid QR code.`});
+            }
+
+            await bookTicketsCollection.insertOne({
+                name: name,
+                email: email,
+                code: code,
+                bookedAt: new Date()
+            })
+
+            const updatedVerificationStatus = await verificationStatusCollection.updateOne({code: code}, {
+                $set: {
+                    createdAt: null,
+                    verified: true
+                }
+            }, {new: true})
+
+            res.status(200).send({message: `Code ${code} received. Verification successful!`, data: updatedVerificationStatus});
         })
 
         app.listen(port, () => {
