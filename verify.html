@@ -15,7 +15,12 @@
       Secure Checkout
     </h2>
 
-    <form onsubmit="handleSubmitForm(event)" class="space-y-5">
+    <!-- // show when successful and wait for verify link  -->
+    <div id="success_message" class="hidden text-green-400 text-center mb-6">
+
+    </div>
+
+    <form onsubmit="handleSubmitForm(event)" class="space-y-5" id="form">
       
       <!-- Reference Code -->
       <div>

@@ -55,7 +55,13 @@
                 return;
             }
 
+            const htmlForm = document.getElementById('form');
+            htmlForm.classList.add('hidden'); 
+            const successMessageDiv = document.getElementById('success_message');
+            successMessageDiv.classList.remove('hidden')
+            successMessageDiv.innerText = 'Account created! Please check your email to verify your account.';
+
             console.log(data)
-            alert(data.message);
+            // alert(data.message);
         })
     }

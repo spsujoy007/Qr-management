@@ -5,6 +5,8 @@ var makeQrCode = require('qrcode');
 var jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+const nodemailer = require('nodemailer')
+
 app.use(express.json());
 
 const cors = require('cors');
@@ -28,6 +30,14 @@ const client = new MongoClient(uri, {
 }
 });
 
+
+const MailTransporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.MAIL_USER,   // your gmail
+        pass: process.env.MAIL_PASS    // app password
+    }
+})
 
 async function run() {
     try {
@@ -94,6 +104,7 @@ async function run() {
                 name: name,
                 email: email,
                 code: code,
+                emaiL_verified: false,
                 bookedAt: new Date()
             })
 
@@ -103,6 +114,25 @@ async function run() {
                     verified: true
                 }
             }, {new: true})
+
+            try {
+                await MailTransporter.sendMail({
+                    from: `"QR Verify" <${process.env.MAIL_USER}>`,
+                    to: email,
+                    subject: "Please verify your email for QR Ticketing System",
+                    html: `<h3>Hello ${name},</h3>
+                           <p>Thank you for booking a ticket using our QR Ticketing System. Please click the link below to verify your email address:</p>
+                           <a href="http://127.0.0.1:5500/verify_email.html?code=${code}">Verify Email</a>
+                           <p>If you did not make this request, please ignore this email.</p>
+                           <br/>
+                           <p>Best regards,<br/>QR Ticketing System Team</p>`
+                })
+                console.log("Email sent to", email)
+
+
+            } catch (err) {
+                console.error("Mail error:", err)
+            }
 
             res.status(200).send({message: `Code ${code} received. Verification successful!`, data: updatedVerificationStatus});
         })
