@@ -45,7 +45,7 @@ async function run() {
         await client.connect();
         console.log("Connected to MongoDB");
         
-        const verificationStatusCollection = client.db("qr_generator").collection("verfication_status");
+        const qrCollection = client.db("qr_generator").collection("qr_code");
         const bookTicketsCollection = client.db("qr_generator").collection("ticket");
         
         app.get("/generate_qr", async(req, res) => {
@@ -73,7 +73,7 @@ async function run() {
                     token: getToken()
                 }
                 
-                verificationStatusCollection.insertOne(datas) 
+                qrCollection.insertOne(datas) 
                 
                 return (res.send({qr_url: url, code: verifyCode.toString()}));
 
@@ -95,7 +95,7 @@ async function run() {
                 return res.status(400).send({status: 400,message: `Code ${code} has already been used for booking.`});
             }
             
-            const isAlreadyQrGenerated = await verificationStatusCollection.findOne({code: code});
+            const isAlreadyQrGenerated = await qrCollection.findOne({code: code});
             if(!isAlreadyQrGenerated){
                 return res.status(401).send({status: 401,message: `Code ${code} is invalid. Please generate a valid QR code.`});
             }
@@ -104,11 +104,11 @@ async function run() {
                 name: name,
                 email: email,
                 code: code,
-                emaiL_verified: false,
+                email_verified: false,
                 bookedAt: new Date()
             })
 
-            const updatedVerificationStatus = await verificationStatusCollection.updateOne({code: code}, {
+            const updatedVerificationStatus = await qrCollection.updateOne({code: code}, {
                 $set: {
                     createdAt: null,
                     verified: true
@@ -137,10 +137,29 @@ async function run() {
             res.status(200).send({message: `Code ${code} received. Verification successful!`, data: updatedVerificationStatus});
         })
 
+        app.get(`/verify_email`, async (req, res) => {
+            const code = req.query.code;
+            console.log(`Email verification code received: ${code}`);
+
+            const isAlreadyQrGenerated = await qrCollection.findOne({code: code});
+            if(!isAlreadyQrGenerated){
+                return res.status(401).send({status: 401,message: `Code ${code} is invalid. Please generate a valid QR code.`});
+            }
+
+            const updatedVerificationStatus = await bookTicketsCollection.updateOne({code: code}, {
+                $set: {
+                    email_verified: true
+                }
+            }, {new: true})
+
+            return res.status(200).send({message: `Email verification successful for code ${code}.`, data: updatedVerificationStatus});
+        })
+
         app.listen(port, () => {
         console.log(`Example app listening on port ${port}`)
         })
     }
+
     catch (error) {
         console.log("Error in myApp function:", error);
     }
