@@ -1,3 +1,5 @@
+// const e = require("express");
+
 const qr_basement = document.getElementById("qr_basement");
 
 document.getElementById("generateNewQr").addEventListener("click", function() {
@@ -10,3 +12,30 @@ document.getElementById("generateNewQr").addEventListener("click", function() {
         console.log(data);
     })
 })
+
+async function handleCheckEmail(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const emailInput = document.getElementById("emailInput").value;
+    console.log("Checking email verification for:", emailInput);
+
+    await fetch(`http://localhost:5000/verify_email_status?email=${emailInput}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        const verificationResult = document.getElementById("verificationResult");
+        if(data.status && data.status === 400){
+            verificationResult.innerText = data.message;
+            verificationResult.classList.add("text-red-500");
+            verificationResult.classList.remove("text-green-500");
+        } else if(data.status && data.status === 200){
+            verificationResult.innerText = data.message;
+            verificationResult.classList.add("text-green-500");
+            verificationResult.classList.remove("text-red-500");
+        }
+    })
+}

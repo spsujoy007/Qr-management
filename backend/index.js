@@ -155,6 +155,20 @@ async function run() {
             return res.status(200).send({message: `Email verification successful for code ${code}.`, data: updatedVerificationStatus});
         })
 
+        app.get(`/verify_email_status`, async (req, res) => {
+            const email = req.query.email;
+
+            const bookingRecord = await bookTicketsCollection.findOne({email: email});
+            if(!bookingRecord){
+                return res.status(400).send({status: 400,message: `No booking found for email ${email}.`});
+            }
+            if(bookingRecord.email_verified){
+                return res.status(200).send({status: 200,message: `Email ${email} is verified.`});
+            } else {
+                return res.status(400).send({status: 400,message: `Email ${email} is not verified.`});
+            }
+        })
+
         app.listen(port, () => {
         console.log(`Example app listening on port ${port}`)
         })
