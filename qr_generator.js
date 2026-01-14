@@ -20,8 +20,11 @@ generateNewQrBtn.addEventListener("click", function() {
     })
 })
 
+const verifyEmailBtn = document.getElementById("verifyEmailBtn");
 async function handleCheckEmail(event) {
     event.preventDefault(); // Prevent default form submission
+    verifyEmailBtn.disabled = true;
+    verifyEmailBtn.innerText = "Checking...";
 
     const emailInput = document.getElementById("emailInput").value;
     console.log("Checking email verification for:", emailInput);
@@ -35,6 +38,8 @@ async function handleCheckEmail(event) {
     .then(res => res.json())
     .then(data => {
         const verificationResult = document.getElementById("verificationResult");
+        verifyEmailBtn.disabled = false;
+        verifyEmailBtn.innerText = "Check Verification";
         if(data.status && data.status === 400){
             verificationResult.innerText = data.message;
             verificationResult.classList.add("text-red-500");

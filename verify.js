@@ -16,6 +16,10 @@
 
     // onsubmit event handler
     async function handleSubmitForm(event) {
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        checkoutBtn.disabled = true;
+        checkoutBtn.innerText = "Processing...";
+
         event.preventDefault(); // Prevent default form submission
 
         const form = event.target;
@@ -60,7 +64,8 @@
             const successMessageDiv = document.getElementById('success_message');
             successMessageDiv.classList.remove('hidden')
             successMessageDiv.innerText = 'Account created! Please check your email to verify your account.';
-
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerText = "Confirm & Checkout";
             console.log(data)
             // alert(data.message);
         })
