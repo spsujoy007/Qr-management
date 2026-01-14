@@ -4,7 +4,7 @@ async function run() {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
 
-    await fetch(`http://localhost:5000/verify_email?code=${JSON.parse(code)}`, {
+    await fetch(`https://qrgeneratorbe.vercel.app/verify_email?code=${JSON.parse(code)}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

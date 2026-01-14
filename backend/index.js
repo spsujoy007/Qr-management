@@ -1,3 +1,5 @@
+// http://localhost:5000
+// http://192.168.1.12:5500
 const express = require('express')
 const app = express()
 const port = 5000
@@ -55,7 +57,7 @@ async function run() {
             const userinfo = {
                 code: verifyCode.toString()
             }
-            makeQrCode.toDataURL(`http://192.168.1.12:5500/verify.html?code=${verifyCode.toString()}`, function (err, url) {
+            makeQrCode.toDataURL(`https://qrmanagement-sp.netlify.app/verify.html?code=${verifyCode.toString()}`, function (err, url) {
                 try {
                     if (err) {
                     console.log(err);
@@ -122,7 +124,7 @@ async function run() {
                     subject: "Please verify your email for QR Ticketing System",
                     html: `<h3>Hello ${name},</h3>
                            <p>Thank you for booking a ticket using our QR Ticketing System. Please click the link below to verify your email address:</p>
-                           <a href="http://127.0.0.1:5500/verify_email.html?code=${code}">Verify Email</a>
+                           <a href="https://qrmanagement-sp.netlify.app/verify_email.html?code=${code}">Verify Email</a>
                            <p>If you did not make this request, please ignore this email.</p>
                            <br/>
                            <p>Best regards,<br/>QR Ticketing System Team</p>`

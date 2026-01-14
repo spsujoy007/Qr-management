@@ -37,7 +37,7 @@ npm run start
 The server listens on http://localhost:5000.
 
 4) Serve the frontend (examples)
-- VS Code Live Server on the project root (commonly http://127.0.0.1:5500)
+- VS Code Live Server on the project root (commonly https://qrmanagement-sp.netlify.app)
 - Or: `python -m http.server 5500` from the project root
 
 ## Frontend pages

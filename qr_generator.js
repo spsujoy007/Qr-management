@@ -3,7 +3,7 @@
 const qr_basement = document.getElementById("qr_basement");
 
 document.getElementById("generateNewQr").addEventListener("click", function() {
-    fetch("http://localhost:5000/generate_qr")
+    fetch("https://qrgeneratorbe.vercel.app/generate_qr")
     .then(res => res.json())
     .then(data => {
         qr_basement.innerHTML = `
@@ -19,7 +19,7 @@ async function handleCheckEmail(event) {
     const emailInput = document.getElementById("emailInput").value;
     console.log("Checking email verification for:", emailInput);
 
-    await fetch(`http://localhost:5000/verify_email_status?email=${emailInput}`, {
+    await fetch(`https://qrgeneratorbe.vercel.app/verify_email_status?email=${emailInput}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

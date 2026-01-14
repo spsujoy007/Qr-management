@@ -23,7 +23,7 @@
         const email = form.email.value;
         console.log("Frontend: ", name, email, code)
 
-        await fetch(`http://localhost:5000/verify?code=${JSON.parse(code)}`, {
+        await fetch(`https://qrgeneratorbe.vercel.app/verify?code=${JSON.parse(code)}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
