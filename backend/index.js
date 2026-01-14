@@ -165,7 +165,7 @@ async function run() {
                 return res.status(400).send({status: 400,message: `No booking found for email ${email}.`});
             }
             if(bookingRecord.email_verified){
-                return res.status(200).send({status: 200,message: `Email ${email} is verified.`});
+                return res.status(200).send({status: 200, message: `Hey ${bookingRecord.name} your email ${email} is verified`});
             } else {
                 return res.status(400).send({status: 400,message: `Email ${email} is not verified.`});
             }

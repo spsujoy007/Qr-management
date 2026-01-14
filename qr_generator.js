@@ -1,15 +1,22 @@
 // const e = require("express");
 
 const qr_basement = document.getElementById("qr_basement");
+const generateNewQrBtn = document.getElementById("generateNewQr");
 
-document.getElementById("generateNewQr").addEventListener("click", function() {
+generateNewQrBtn.addEventListener("click", function() {
+    generateNewQrBtn.disabled = true;
+    generateNewQrBtn.innerText = "Generating...";
     fetch("https://qrgeneratorbe.vercel.app/generate_qr")
     .then(res => res.json())
     .then(data => {
+        if(data){
         qr_basement.innerHTML = `
         <h1 class="text-xl font-semibold text-orange-500 pb-2">Scan this QR code to verify</h1>
         <img style="width: 220px; height: 220px;" src="${data?.qr_url}">`;
         console.log(data);
+    }
+        generateNewQrBtn.disabled = false;
+        generateNewQrBtn.innerText = "Generate New QR";
     })
 })
 
