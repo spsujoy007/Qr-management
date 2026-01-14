@@ -34,7 +34,7 @@ JWT_SECRET=replace_with_strong_secret
 ```
 npm run start
 ```
-The server listens on http://localhost:5000.
+The server listens on https://qrgeneratorbe.vercel.app.
 
 4) Serve the frontend (examples)
 - VS Code Live Server on the project root (commonly https://qrmanagement-sp.netlify.app)
@@ -63,6 +63,6 @@ The server listens on http://localhost:5000.
 - validate client inputs further if exposing publicly.
 
 ## Troubleshooting
-- CORS issues: frontend must hit http://localhost:5000 (or update fetch URLs).
+- CORS issues: frontend must hit https://qrgeneratorbe.vercel.app (or update fetch URLs).
 - Email not sending: confirm MAIL_USER/MAIL_PASS and allow Gmail App Passwords.
 - Mongo connection: verify MONGODB_URI and network access.

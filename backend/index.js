@@ -1,4 +1,4 @@
-// http://localhost:5000
+// https://qrgeneratorbe.vercel.app
 // http://192.168.1.12:5500
 const express = require('express')
 const app = express()
